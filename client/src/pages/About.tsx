@@ -92,7 +92,7 @@ export default function About() {
           <FadeInSection>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
               <img
-                src="/manus-storage/katie-photo_e207e47a.jpg"
+                src="/manus-storage/katie-photo_458adacd.jpg"
                 alt="Katie Tseng Mohammed"
                 className="w-full max-w-sm mx-auto h-[400px] object-cover rounded-lg"
               />
@@ -117,7 +117,7 @@ export default function About() {
                 </p>
               </div>
               <img
-                src="/manus-storage/shelby-photo_15fd8a89.jpg"
+                src="/manus-storage/shelby-photo_0890965f.jpg"
                 alt="Shelby Marie Karros"
                 className="w-full max-w-sm mx-auto h-[400px] object-cover rounded-lg order-1 lg:order-2"
               />

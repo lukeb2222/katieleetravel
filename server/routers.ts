@@ -191,7 +191,12 @@ export const appRouter = router({
           autoApproved = isPositive;
         }
         await createReview({ ...input, status: autoApproved ? "approved" : "pending" });
-        if (!autoApproved) {
+        if (autoApproved) {
+          await notifyOwner({
+            title: "New 5-Star Review Auto-Approved",
+            content: `${input.name} left a 5-star review${input.destination ? ` about ${input.destination}` : ''}: "${input.content.substring(0, 150)}${input.content.length > 150 ? '...' : ''}". It has been automatically published.`,
+          });
+        } else {
           await notifyOwner({
             title: "New Review Needs Approval",
             content: `${input.name} left a ${input.rating}-star review${input.destination ? ` about ${input.destination}` : ''}. Please review and approve/reject it in the admin dashboard.`,

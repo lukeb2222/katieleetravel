@@ -29,9 +29,9 @@ function FadeInSection({ children, className = "", delay = 0 }: { children: Reac
 }
 
 function TestimonialCarousel() {
-  const { data: reviews, isLoading } = trpc.reviews.list.useQuery();
+  const { data: reviews, isLoading } = trpc.reviews.approved.useQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const testimonials = reviews?.filter((r: any) => r.status === "approved") || [];
+  const testimonials = reviews || [];
 
   useEffect(() => {
     if (testimonials.length === 0) return;
@@ -155,7 +155,7 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal italic mb-6"
           >
-            Your Eye on the World
+            For Those Who Travel with Intention
           </motion.h1>
           <motion.div
             initial={{ opacity: 0 }}
@@ -289,7 +289,7 @@ export default function Home() {
             <FadeInSection delay={0.1}>
               <div className="text-center">
                 <img
-                  src="/manus-storage/katie-photo_e207e47a.jpg"
+                  src="/manus-storage/katie-photo_458adacd.jpg"
                   alt="Katie Tseng Mohammed"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />
@@ -303,7 +303,7 @@ export default function Home() {
             <FadeInSection delay={0.2}>
               <div className="text-center">
                 <img
-                  src="/manus-storage/shelby-photo_15fd8a89.jpg"
+                  src="/manus-storage/shelby-photo_0890965f.jpg"
                   alt="Shelby Marie Karros"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />

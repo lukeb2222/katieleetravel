@@ -1,76 +1,84 @@
 import { useState } from "react";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
 import { toast } from "sonner";
-import { Star, Mail, FileText, MessageSquare, CheckCircle, XCircle, Clock, Archive, Send, X } from "lucide-react";
+import { Star, Mail, FileText, MessageSquare, CheckCircle, XCircle, Clock, Archive, Send, X, Lock } from "lucide-react";
 
 type Tab = "contacts" | "questionnaires" | "reviews";
 
 export default function AdminDashboard() {
-  const { user, loading, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("contacts");
+  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem("admin_key") || "");
+  const [keyInput, setKeyInput] = useState("");
+  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_key"));
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    sessionStorage.setItem("admin_key", keyInput);
+    setAdminKey(keyInput);
+    setAuthenticated(true);
+  };
 
-  if (!isAuthenticated) {
+  if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-serif text-2xl mb-4">Admin Access Required</h1>
-          <p className="text-muted-foreground mb-6">Please log in to access the dashboard.</p>
-          <a href={getLoginUrl()} className="bg-primary text-primary-foreground px-6 py-2.5 text-label text-sm">
-            Log In
-          </a>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-sm w-full px-6">
+          <Lock className="mx-auto mb-4 text-primary" size={32} strokeWidth={1.5} />
+          <h1 className="font-serif text-2xl mb-2">Admin Dashboard</h1>
+          <p className="text-muted-foreground text-sm mb-6">Enter admin password to continue.</p>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="password"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              placeholder="Admin password"
+              className="w-full px-4 py-2.5 border border-border bg-white text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            <button
+              type="submit"
+              className="w-full bg-primary text-primary-foreground px-6 py-2.5 text-label text-sm hover:bg-primary/90 transition-colors"
+            >
+              Access Dashboard
+            </button>
+          </form>
         </div>
       </div>
     );
   }
-
-  if (user?.role !== "admin") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-serif text-2xl mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">You don't have admin permissions.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const tabs: { key: Tab; label: string; icon: typeof Mail }[] = [
-    { key: "contacts", label: "Contact Messages", icon: Mail },
-    { key: "questionnaires", label: "Questionnaires", icon: FileText },
-    { key: "reviews", label: "Reviews", icon: MessageSquare },
-  ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="border-b border-border bg-white">
+        <div className="container py-4 flex items-center justify-between">
           <h1 className="font-serif text-xl">Katie Lee Travel — Admin</h1>
-
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("admin_key");
+              setAuthenticated(false);
+              setAdminKey("");
+            }}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Log Out
+          </button>
         </div>
-      </header>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-white rounded-lg p-1 border border-border w-fit">
-          {tabs.map(({ key, label, icon: Icon }) => (
+      {/* Tabs */}
+      <div className="container py-6">
+        <div className="flex gap-2 mb-8">
+          {([
+            { id: "contacts" as Tab, label: "Contact Messages", icon: Mail },
+            { id: "questionnaires" as Tab, label: "Questionnaires", icon: FileText },
+            { id: "reviews" as Tab, label: "Reviews", icon: MessageSquare },
+          ]).map(({ id, label, icon: Icon }) => (
             <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
-                activeTab === key
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm rounded transition-colors ${
+                activeTab === id
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "bg-white text-foreground/70 hover:bg-secondary"
               }`}
             >
               <Icon size={16} />
@@ -79,244 +87,217 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Content */}
-        {activeTab === "contacts" && <ContactsPanel />}
-        {activeTab === "questionnaires" && <QuestionnairesPanel />}
-        {activeTab === "reviews" && <ReviewsPanel />}
+        {activeTab === "contacts" && <ContactsPanel adminKey={adminKey} />}
+        {activeTab === "questionnaires" && <QuestionnairesPanel adminKey={adminKey} />}
+        {activeTab === "reviews" && <ReviewsPanel adminKey={adminKey} />}
       </div>
     </div>
   );
 }
 
-function ContactsPanel() {
-  const { data: contacts, isLoading } = trpc.contact.list.useQuery();
+function ContactsPanel({ adminKey }: { adminKey: string }) {
+  const { data: contacts, isLoading, error } = trpc.contact.list.useQuery(undefined, {
+    retry: false,
+  });
   const updateStatus = trpc.contact.updateStatus.useMutation();
-  const sendReply = trpc.contact.reply.useMutation();
   const utils = trpc.useUtils();
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [replyMessage, setReplyMessage] = useState("");
 
-  const handleStatusChange = async (id: number, status: "new" | "read" | "replied" | "archived") => {
-    await updateStatus.mutateAsync({ id, status });
-    utils.contact.list.invalidate();
-    toast.success("Status updated");
-  };
-
-  const handleSendReply = async (id: number, email: string, firstName: string) => {
-    if (!replyMessage.trim()) {
-      toast.error("Please enter a reply message");
-      return;
-    }
-    try {
-      // Open the user's email client with the reply pre-filled
-      const subject = encodeURIComponent(`Re: Your inquiry - Katie Lee Travel Co.`);
-      const body = encodeURIComponent(`Hi ${firstName},\n\n${replyMessage}\n\nBest regards,\nKatie Lee Travel Co.`);
-      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-      
-      // Mark as replied in the system
-      await sendReply.mutateAsync({ id, email, firstName, message: replyMessage });
-      utils.contact.list.invalidate();
-      toast.success(`Email client opened for ${email} — status marked as replied`);
-      setReplyingTo(null);
-      setReplyMessage("");
-    } catch {
-      toast.error("Failed to update status. Please try again.");
-    }
-  };
-
-  if (isLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading) return <p className="text-center text-muted-foreground">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Access denied. Check your admin password.</p>;
+  if (!contacts || contacts.length === 0) return <p className="text-center text-muted-foreground">No contact submissions yet.</p>;
 
   return (
     <div className="space-y-4">
-      {contacts && contacts.length > 0 ? (
-        contacts.map((c) => (
-          <div key={c.id} className="bg-white border border-border rounded-lg p-6">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-medium">{c.firstName} {c.lastName}</h3>
-                <p className="text-sm text-muted-foreground">{c.email} {c.phone && `· ${c.phone}`}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-1 rounded ${
-                  c.status === "new" ? "bg-blue-100 text-blue-700" :
-                  c.status === "read" ? "bg-yellow-100 text-yellow-700" :
-                  c.status === "replied" ? "bg-green-100 text-green-700" :
-                  "bg-gray-100 text-gray-700"
-                }`}>
-                  {c.status}
-                </span>
-              </div>
+      {contacts.map((c: any) => (
+        <div key={c.id} className="bg-white border border-border p-5 rounded">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-medium">{c.firstName} {c.lastName}</h3>
+              <p className="text-sm text-muted-foreground">{c.email}{c.phone ? ` · ${c.phone}` : ""}</p>
             </div>
-            {c.subject && <p className="text-sm font-medium mb-1">{c.subject}</p>}
-            <p className="text-sm text-muted-foreground mb-4">{c.message}</p>
-
-            {/* Reply Form */}
-            {replyingTo === c.id && (
-              <div className="mb-4 p-4 bg-muted/50 rounded-lg border border-border">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-muted-foreground">Replying to {c.email}</p>
-                  <button onClick={() => { setReplyingTo(null); setReplyMessage(""); }} className="text-muted-foreground hover:text-foreground">
-                    <X size={14} />
-                  </button>
-                </div>
-                <textarea
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your reply..."
-                  className="w-full p-3 border border-border rounded-md text-sm min-h-[100px] bg-white focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="flex justify-end mt-2">
-                  <button
-                    onClick={() => handleSendReply(c.id, c.email, c.firstName)}
-                    disabled={sendReply.isPending}
-                    className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm hover:bg-primary/90 disabled:opacity-50"
-                  >
-                    <Send size={14} />
-                    {sendReply.isPending ? "Sending..." : "Send Reply"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 text-xs flex-wrap">
-              <span className="text-muted-foreground">{new Date(c.createdAt).toLocaleString()}</span>
-              <span className="text-muted-foreground">·</span>
-              <button onClick={() => { setReplyingTo(c.id); setReplyMessage(""); }} className="text-primary hover:underline flex items-center gap-1"><Send size={12} /> Reply via Email</button>
-              <button onClick={() => handleStatusChange(c.id, "read")} className="text-blue-600 hover:underline flex items-center gap-1"><Clock size={12} /> Mark Read</button>
-              <button onClick={() => handleStatusChange(c.id, "archived")} className="text-gray-600 hover:underline flex items-center gap-1"><Archive size={12} /> Archive</button>
-            </div>
+            <span className={`text-xs px-2 py-1 rounded ${
+              c.status === "new" ? "bg-blue-100 text-blue-700" :
+              c.status === "read" ? "bg-yellow-100 text-yellow-700" :
+              c.status === "replied" ? "bg-green-100 text-green-700" :
+              "bg-gray-100 text-gray-700"
+            }`}>
+              {c.status}
+            </span>
           </div>
-        ))
-      ) : (
-        <p className="text-muted-foreground text-center py-8">No contact submissions yet.</p>
-      )}
+          {c.subject && <p className="text-sm font-medium mb-1">{c.subject}</p>}
+          <p className="text-sm text-muted-foreground mb-3">{c.message}</p>
+          <div className="flex gap-2">
+            <a
+              href={`mailto:${c.email}?subject=Re: ${c.subject || "Your inquiry"}&body=Hi ${c.firstName},%0D%0A%0D%0A`}
+              className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded flex items-center gap-1 hover:bg-primary/90 transition-colors"
+              onClick={() => {
+                updateStatus.mutate({ id: c.id, status: "replied" }, {
+                  onSuccess: () => utils.contact.list.invalidate(),
+                });
+              }}
+            >
+              <Send size={12} /> Reply via Email
+            </a>
+            {c.status === "new" && (
+              <button
+                onClick={() => updateStatus.mutate({ id: c.id, status: "read" }, {
+                  onSuccess: () => utils.contact.list.invalidate(),
+                })}
+                className="text-xs bg-secondary text-foreground/70 px-3 py-1.5 rounded hover:bg-secondary/80 transition-colors"
+              >
+                Mark Read
+              </button>
+            )}
+            <button
+              onClick={() => updateStatus.mutate({ id: c.id, status: "archived" }, {
+                onSuccess: () => utils.contact.list.invalidate(),
+              })}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2"
+            >
+              <Archive size={12} />
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function QuestionnairesPanel() {
-  const { data: responses, isLoading } = trpc.questionnaire.list.useQuery();
+function QuestionnairesPanel({ adminKey }: { adminKey: string }) {
+  const { data: questionnaires, isLoading, error } = trpc.questionnaire.list.useQuery(undefined, {
+    retry: false,
+  });
   const updateStatus = trpc.questionnaire.updateStatus.useMutation();
   const utils = trpc.useUtils();
 
-  const handleStatusChange = async (id: number, status: "new" | "reviewed" | "in_progress" | "completed") => {
-    await updateStatus.mutateAsync({ id, status });
-    utils.questionnaire.list.invalidate();
-    toast.success("Status updated");
-  };
-
-  if (isLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading) return <p className="text-center text-muted-foreground">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Access denied. Check your admin password.</p>;
+  if (!questionnaires || questionnaires.length === 0) return <p className="text-center text-muted-foreground">No questionnaire responses yet.</p>;
 
   return (
     <div className="space-y-4">
-      {responses && responses.length > 0 ? (
-        responses.map((q) => (
-          <div key={q.id} className="bg-white border border-border rounded-lg p-6">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-medium">{q.firstName} {q.lastName}</h3>
-                <p className="text-sm text-muted-foreground">{q.email} {q.phone && `· ${q.phone}`}</p>
-              </div>
-              <span className={`text-xs px-2 py-1 rounded ${
-                q.status === "new" ? "bg-blue-100 text-blue-700" :
-                q.status === "reviewed" ? "bg-yellow-100 text-yellow-700" :
-                q.status === "in_progress" ? "bg-purple-100 text-purple-700" :
-                "bg-green-100 text-green-700"
-              }`}>
-                {q.status.replace("_", " ")}
-              </span>
+      {questionnaires.map((q: any) => (
+        <div key={q.id} className="bg-white border border-border p-5 rounded">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h3 className="font-medium">{q.firstName} {q.lastName}</h3>
+              <p className="text-sm text-muted-foreground">{q.email}{q.phone ? ` · ${q.phone}` : ""}</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm mb-4">
-              {q.destination && <div><span className="text-muted-foreground">Destination:</span> {q.destination}</div>}
-              {q.travelDates && <div><span className="text-muted-foreground">Dates:</span> {q.travelDates}</div>}
-              {q.travelers && <div><span className="text-muted-foreground">Travelers:</span> {q.travelers}</div>}
-              {q.budget && <div><span className="text-muted-foreground">Budget:</span> {q.budget}</div>}
-              {q.occasion && <div><span className="text-muted-foreground">Occasion:</span> {q.occasion}</div>}
-              {q.accommodationStyle && <div><span className="text-muted-foreground">Style:</span> {q.accommodationStyle}</div>}
-            </div>
-            {q.interests && <p className="text-sm mb-2"><span className="text-muted-foreground">Interests:</span> {q.interests}</p>}
-            {q.additionalNotes && <p className="text-sm mb-2"><span className="text-muted-foreground">Notes:</span> {q.additionalNotes}</p>}
-            <div className="flex items-center gap-2 text-xs mt-4">
-              <span className="text-muted-foreground">{new Date(q.createdAt).toLocaleString()}</span>
-              <span className="text-muted-foreground">·</span>
-              <button onClick={() => handleStatusChange(q.id, "reviewed")} className="text-yellow-600 hover:underline">Reviewed</button>
-              <button onClick={() => handleStatusChange(q.id, "in_progress")} className="text-purple-600 hover:underline">In Progress</button>
-              <button onClick={() => handleStatusChange(q.id, "completed")} className="text-green-600 hover:underline">Completed</button>
-            </div>
+            <span className={`text-xs px-2 py-1 rounded ${
+              q.status === "new" ? "bg-blue-100 text-blue-700" :
+              q.status === "reviewed" ? "bg-yellow-100 text-yellow-700" :
+              q.status === "in_progress" ? "bg-purple-100 text-purple-700" :
+              "bg-green-100 text-green-700"
+            }`}>
+              {q.status}
+            </span>
           </div>
-        ))
-      ) : (
-        <p className="text-muted-foreground text-center py-8">No questionnaire responses yet.</p>
-      )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+            {q.destination && <p><span className="text-muted-foreground">Destination:</span> {q.destination}</p>}
+            {q.travelDates && <p><span className="text-muted-foreground">Dates:</span> {q.travelDates}</p>}
+            {q.travelers && <p><span className="text-muted-foreground">Travelers:</span> {q.travelers}</p>}
+            {q.budget && <p><span className="text-muted-foreground">Budget:</span> {q.budget}</p>}
+            {q.occasion && <p><span className="text-muted-foreground">Occasion:</span> {q.occasion}</p>}
+            {q.accommodationStyle && <p><span className="text-muted-foreground">Accommodation:</span> {q.accommodationStyle}</p>}
+            {q.interests && <p><span className="text-muted-foreground">Interests:</span> {q.interests}</p>}
+            {q.dietaryNeeds && <p><span className="text-muted-foreground">Dietary:</span> {q.dietaryNeeds}</p>}
+            {q.mobilityNeeds && <p><span className="text-muted-foreground">Mobility:</span> {q.mobilityNeeds}</p>}
+          </div>
+          {q.additionalNotes && <p className="text-sm mt-2 text-muted-foreground italic">"{q.additionalNotes}"</p>}
+          <div className="flex gap-2 mt-3">
+            <select
+              value={q.status}
+              onChange={(e) => updateStatus.mutate(
+                { id: q.id, status: e.target.value as any },
+                { onSuccess: () => utils.questionnaire.list.invalidate() }
+              )}
+              className="text-xs border border-border px-2 py-1 rounded bg-white"
+            >
+              <option value="new">New</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <a
+              href={`mailto:${q.email}?subject=Your Travel Questionnaire&body=Hi ${q.firstName},%0D%0A%0D%0AThank you for submitting your travel questionnaire!%0D%0A%0D%0A`}
+              className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded flex items-center gap-1 hover:bg-primary/90 transition-colors"
+            >
+              <Send size={12} /> Email Client
+            </a>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function ReviewsPanel() {
-  const { data: reviews, isLoading } = trpc.reviews.list.useQuery();
+function ReviewsPanel({ adminKey }: { adminKey: string }) {
+  const { data: reviews, isLoading, error } = trpc.reviews.list.useQuery(undefined, {
+    retry: false,
+  });
   const updateStatus = trpc.reviews.updateStatus.useMutation();
   const utils = trpc.useUtils();
 
-  const handleStatusChange = async (id: number, status: "pending" | "approved" | "rejected") => {
-    await updateStatus.mutateAsync({ id, status });
-    utils.reviews.list.invalidate();
-    toast.success(`Review ${status}`);
-  };
-
-  if (isLoading) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading) return <p className="text-center text-muted-foreground">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Access denied. Check your admin password.</p>;
+  if (!reviews || reviews.length === 0) return <p className="text-center text-muted-foreground">No reviews yet.</p>;
 
   return (
     <div className="space-y-4">
-      {reviews && reviews.length > 0 ? (
-        reviews.map((r) => (
-          <div key={r.id} className="bg-white border border-border rounded-lg p-6">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="font-medium">{r.name}</h3>
-                <p className="text-sm text-muted-foreground">{r.email} {r.location && `· ${r.location}`}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={14} className={star <= r.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-300"} />
+      {reviews.map((r: any) => (
+        <div key={r.id} className="bg-white border border-border p-5 rounded">
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} className={i < r.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"} />
                   ))}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded ${
-                  r.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                  r.status === "approved" ? "bg-green-100 text-green-700" :
-                  "bg-red-100 text-red-700"
-                }`}>
-                  {r.status}
-                </span>
+                <span className="text-sm font-medium">{r.name}</span>
               </div>
+              {r.title && <p className="text-sm font-medium">{r.title}</p>}
             </div>
-            {r.title && <p className="text-sm font-medium mb-1">{r.title}</p>}
-            <p className="text-sm text-muted-foreground mb-4">"{r.content}"</p>
-            {r.destination && <p className="text-xs text-muted-foreground mb-3">Destination: {r.destination}</p>}
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">{new Date(r.createdAt).toLocaleString()}</span>
-              <span className="text-muted-foreground">·</span>
-              {r.status !== "approved" && (
-                <button onClick={() => handleStatusChange(r.id, "approved")} className="text-green-600 hover:underline flex items-center gap-1">
-                  <CheckCircle size={12} /> Approve
-                </button>
-              )}
-              {r.status !== "rejected" && (
-                <button onClick={() => handleStatusChange(r.id, "rejected")} className="text-red-600 hover:underline flex items-center gap-1">
-                  <XCircle size={12} /> Reject
-                </button>
-              )}
-              {r.status !== "pending" && (
-                <button onClick={() => handleStatusChange(r.id, "pending")} className="text-yellow-600 hover:underline flex items-center gap-1">
-                  <Clock size={12} /> Set Pending
-                </button>
-              )}
-            </div>
+            <span className={`text-xs px-2 py-1 rounded ${
+              r.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+              r.status === "approved" ? "bg-green-100 text-green-700" :
+              "bg-red-100 text-red-700"
+            }`}>
+              {r.status}
+            </span>
           </div>
-        ))
-      ) : (
-        <p className="text-muted-foreground text-center py-8">No reviews yet.</p>
-      )}
+          <p className="text-sm text-muted-foreground mb-2">"{r.content}"</p>
+          {r.destination && <p className="text-xs text-muted-foreground mb-3">Destination: {r.destination}</p>}
+          <div className="flex gap-2">
+            {r.status !== "approved" && (
+              <button
+                onClick={() => updateStatus.mutate({ id: r.id, status: "approved" }, {
+                  onSuccess: () => {
+                    utils.reviews.list.invalidate();
+                    toast.success("Review approved");
+                  },
+                })}
+                className="text-xs bg-green-600 text-white px-3 py-1.5 rounded flex items-center gap-1 hover:bg-green-700 transition-colors"
+              >
+                <CheckCircle size={12} /> Approve
+              </button>
+            )}
+            {r.status !== "rejected" && (
+              <button
+                onClick={() => updateStatus.mutate({ id: r.id, status: "rejected" }, {
+                  onSuccess: () => {
+                    utils.reviews.list.invalidate();
+                    toast.success("Review rejected");
+                  },
+                })}
+                className="text-xs bg-red-600 text-white px-3 py-1.5 rounded flex items-center gap-1 hover:bg-red-700 transition-colors"
+              >
+                <XCircle size={12} /> Reject
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

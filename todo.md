@@ -26,3 +26,7 @@
 - [x] Import OG testimonials from original site into reviews database
 - [x] Hide admin name from dashboard header
 - [x] Add rotating featured testimonial carousel on homepage pulling from approved reviews
+- [ ] Set up email notifications to Katie for new contact form submissions
+- [ ] Set up email notifications to Katie for new review submissions
+- [ ] Remove all Manus OAuth/sign-in from public-facing pages (no login for visitors)
+- [ ] Set up Resend email notifications for contact/review submissions to katie.lee@smartflyer.com
