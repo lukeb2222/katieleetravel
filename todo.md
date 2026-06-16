@@ -23,3 +23,5 @@
 - [x] Implement LLM-based positivity check for 5-star review auto-approval
 - [x] Add partner logos (Virtuoso, SmartFlyer) as actual images
 - [x] Merge questionnaire into the contact form page (remove separate /questionnaire route)
+- [x] Import OG testimonials from original site into reviews database
+- [x] Hide admin name from dashboard header

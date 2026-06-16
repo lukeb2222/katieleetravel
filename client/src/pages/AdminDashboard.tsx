@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <header className="bg-white border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="font-serif text-xl">Katie Lee Travel — Admin</h1>
-          <span className="text-sm text-muted-foreground">{user.name || user.email}</span>
+
         </div>
       </header>
 
