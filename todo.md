@@ -1,0 +1,25 @@
+# Project TODO
+
+- [x] Set up Google Fonts (Playfair Display + Lato) and global CSS theme
+- [x] Build animated hero section with image carousel
+- [x] Build navigation (sticky header with scroll transition, mobile hamburger)
+- [x] Build mission statement section with brand mark
+- [x] Build services section (split layout)
+- [x] Build "How It Works" 6-step process section
+- [x] Build Hotel Portal CTA section with Virtuoso link
+- [x] Build contact form (public-facing) with backend storage
+- [x] Build admin dashboard for Katie to view/respond to submissions
+- [x] Build footer with navigation links
+- [x] Build About page
+- [x] Build separate client questionnaire page (not in main nav)
+- [x] Add scroll-triggered animations throughout
+- [x] Ensure mobile-responsive design across all sections
+- [x] Build review system - public review submission form
+- [x] Auto-approve 5-star reviews, require manual approval for others
+- [x] Display approved reviews on testimonials/reviews page
+- [x] Admin dashboard: review moderation (approve/reject reviews)
+- [x] Build "Our Team" section with Katie and Shelby's real photos and bios
+- [x] Add email reply workflow in admin dashboard for contact submissions
+- [x] Implement LLM-based positivity check for 5-star review auto-approval
+- [x] Add partner logos (Virtuoso, SmartFlyer) as actual images
+- [x] Merge questionnaire into the contact form page (remove separate /questionnaire route)
