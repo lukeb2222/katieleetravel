@@ -226,10 +226,7 @@ export default function Reviews() {
                     </p>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span className="font-medium text-foreground">{review.name}</span>
-                      <span>
-                        {review.destination && `${review.destination} · `}
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
+                      {review.destination && <span>{review.destination}</span>}
                     </div>
                   </div>
                 </FadeInSection>
