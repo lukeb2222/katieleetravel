@@ -25,3 +25,4 @@
 - [x] Merge questionnaire into the contact form page (remove separate /questionnaire route)
 - [x] Import OG testimonials from original site into reviews database
 - [x] Hide admin name from dashboard header
+- [x] Add rotating featured testimonial carousel on homepage pulling from approved reviews

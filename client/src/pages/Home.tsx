@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { trpc } from "@/lib/trpc";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { ArrowRight, Globe, Star, Heart, MapPin, Calendar, Plane } from "lucide-react";
+import { ArrowRight, Globe, Star, Heart, MapPin, Calendar, Plane, Quote } from "lucide-react";
 
 const HERO_IMAGES = [
   "/manus-storage/hero-1_dedb38ae.jpg",
@@ -24,6 +25,92 @@ function FadeInSection({ children, className = "", delay = 0 }: { children: Reac
     >
       {children}
     </motion.div>
+  );
+}
+
+function TestimonialCarousel() {
+  const { data: reviews, isLoading } = trpc.reviews.list.useQuery();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const testimonials = reviews?.filter((r: any) => r.status === "approved") || [];
+
+  useEffect(() => {
+    if (testimonials.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  if (isLoading) {
+    return (
+      <section className="py-24 md:py-32 bg-secondary/50">
+        <div className="container max-w-4xl text-center">
+          <Quote className="mx-auto mb-6 text-primary/30 animate-pulse" size={48} strokeWidth={1} />
+          <div className="h-24 flex items-center justify-center">
+            <div className="w-3/4 h-4 bg-primary/10 rounded animate-pulse" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) return null;
+
+  const current = testimonials[currentIndex];
+
+  return (
+    <section className="py-24 md:py-32 bg-secondary/50">
+      <div className="container max-w-4xl text-center">
+        <FadeInSection>
+          <Quote className="mx-auto mb-6 text-primary/30" size={48} strokeWidth={1} />
+          <div className="relative min-h-[200px] flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                className="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <p className="font-serif text-xl md:text-2xl text-foreground/80 italic leading-relaxed mb-6 px-4">
+                  "{current?.content?.length > 200 ? current.content.substring(0, 200) + '...' : current?.content}"
+                </p>
+                <div className="flex items-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm font-medium text-foreground">{current?.name}</p>
+                {current?.destination && (
+                  <p className="text-xs text-muted-foreground mt-1">{current.destination}</p>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-8">
+            {testimonials.map((_: any, i: number) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  currentIndex === i ? "bg-primary w-5" : "bg-primary/20"
+                }`}
+              />
+            ))}
+          </div>
+
+          <Link
+            href="/reviews"
+            className="inline-flex items-center gap-2 mt-8 text-label text-primary hover:text-foreground transition-colors"
+          >
+            Read All Reviews <ArrowRight size={14} />
+          </Link>
+        </FadeInSection>
+      </div>
+    </section>
   );
 }
 
@@ -253,6 +340,9 @@ export default function Home() {
           </FadeInSection>
         </div>
       </section>
+
+      {/* Featured Testimonials */}
+      <TestimonialCarousel />
 
       {/* Partner Logos */}
       <section className="py-12 border-t border-border">
