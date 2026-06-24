@@ -19,6 +19,13 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
+      headers() {
+        const adminKey = sessionStorage.getItem("admin_key");
+        if (adminKey) {
+          return { "x-admin-key": adminKey };
+        }
+        return {};
+      },
       fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),
