@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const LOGO_URL = "/manus-storage/katie-lee-logo_49bcf825.png";
+const LOGO_URL = "/images/katie-lee-logo.png";
 
 const navLinks = [
   { href: "/about", label: "About" },

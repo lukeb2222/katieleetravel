@@ -7,9 +7,9 @@ import Footer from "@/components/Footer";
 import { ArrowRight, Globe, Star, Heart, MapPin, Calendar, Plane, Quote } from "lucide-react";
 
 const HERO_IMAGES = [
-  "/manus-storage/hero-1_dedb38ae.jpg",
-  "/manus-storage/hero-2_deb55c34.jpg",
-  "/manus-storage/hero-3_e82919b0.jpg",
+  "/images/hero-1.jpg",
+  "/images/hero-2.jpg",
+  "/images/hero-3.jpg",
 ];
 
 function FadeInSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -206,7 +206,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <FadeInSection>
               <img
-                src="/manus-storage/services-image_a0451121.jpg"
+                src="/images/services-image.jpg"
                 alt="Luxury travel destination"
                 className="w-full h-[500px] object-cover rounded-lg"
               />
@@ -289,7 +289,7 @@ export default function Home() {
             <FadeInSection delay={0.1}>
               <div className="text-center">
                 <img
-                  src="/manus-storage/katie-photo_458adacd.jpg"
+                  src="/images/katie-photo.jpg"
                   alt="Katie Tseng Mohammed"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />
@@ -303,7 +303,7 @@ export default function Home() {
             <FadeInSection delay={0.2}>
               <div className="text-center">
                 <img
-                  src="/manus-storage/shelby-photo_0890965f.jpg"
+                  src="/images/shelby-photo.jpg"
                   alt="Shelby Marie Karros"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />
@@ -349,8 +349,8 @@ export default function Home() {
         <div className="container">
           <FadeInSection>
             <div className="flex items-center justify-center gap-12 md:gap-20 opacity-70">
-              <img src="/manus-storage/virtuoso-logo_4a3fab3c.png" alt="Virtuoso" className="h-10 md:h-12 object-contain" />
-              <img src="/manus-storage/smartflyer-logo_97a058f3.png" alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
+              <img src="/images/virtuoso-logo.png" alt="Virtuoso" className="h-10 md:h-12 object-contain" />
+              <img src="/images/smartflyer-logo.png" alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
             </div>
           </FadeInSection>
         </div>

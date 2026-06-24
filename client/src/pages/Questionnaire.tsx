@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
 
-const LOGO_URL = "/manus-storage/katie-lee-logo_49bcf825.png";
+const LOGO_URL = "/images/katie-lee-logo.png";
 
 export default function Questionnaire() {
   const submitQuestionnaire = trpc.questionnaire.submit.useMutation();

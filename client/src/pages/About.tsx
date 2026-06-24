@@ -60,7 +60,7 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <FadeInSection>
               <img
-                src="/manus-storage/about-katie_3c4cce16.jpg"
+                src="/images/about-katie.jpg"
                 alt="Luxury travel"
                 className="w-full h-[400px] object-cover rounded-lg"
               />
@@ -92,7 +92,7 @@ export default function About() {
           <FadeInSection>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
               <img
-                src="/manus-storage/katie-photo_458adacd.jpg"
+                src="/images/katie-photo.jpg"
                 alt="Katie Tseng Mohammed"
                 className="w-full max-w-sm mx-auto h-[400px] object-cover rounded-lg"
               />
@@ -117,7 +117,7 @@ export default function About() {
                 </p>
               </div>
               <img
-                src="/manus-storage/shelby-photo_0890965f.jpg"
+                src="/images/shelby-photo.jpg"
                 alt="Shelby Marie Karros"
                 className="w-full max-w-sm mx-auto h-[400px] object-cover rounded-lg order-1 lg:order-2"
               />
@@ -136,8 +136,8 @@ export default function About() {
               As a proud affiliate of both Virtuoso and SmartFlyer, we have access to exclusive partnerships with the world's finest hotels and travel vendors, ensuring our clients receive unparalleled VIP treatment wherever they go.
             </p>
             <div className="flex items-center justify-center gap-12 mt-8 opacity-70">
-              <img src="/manus-storage/virtuoso-logo_4a3fab3c.png" alt="Virtuoso" className="h-10 md:h-12 object-contain" />
-              <img src="/manus-storage/smartflyer-logo_97a058f3.png" alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
+              <img src="/images/virtuoso-logo.png" alt="Virtuoso" className="h-10 md:h-12 object-contain" />
+              <img src="/images/smartflyer-logo.png" alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
             </div>
           </FadeInSection>
         </div>

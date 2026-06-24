@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 
-const LOGO_URL = "/manus-storage/katie-lee-logo_49bcf825.png";
+const LOGO_URL = "/images/katie-lee-logo.png";
 
 export default function Footer() {
   return (
