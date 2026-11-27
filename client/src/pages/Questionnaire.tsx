@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
+import { asset } from "@/lib/static";
 
-const LOGO_URL = "/images/katie-lee-logo.png";
+const LOGO_URL = asset("/images/katie-lee-logo.png");
 
 export default function Questionnaire() {
   const submitQuestionnaire = trpc.questionnaire.submit.useMutation();

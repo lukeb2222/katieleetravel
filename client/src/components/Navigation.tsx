@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { asset } from "@/lib/static";
 
-const LOGO_URL = "/images/katie-lee-logo.png";
+const LOGO_URL = asset("/images/katie-lee-logo.png");
 
 const navLinks = [
   { href: "/about", label: "About" },
