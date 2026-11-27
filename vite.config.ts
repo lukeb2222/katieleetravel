@@ -4,6 +4,8 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  // Deployed sub-path, e.g. "/katieleetravel/" on GitHub Pages.
+  base: process.env.VITE_BASE || "/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

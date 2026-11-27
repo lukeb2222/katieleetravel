@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
+import { EMAIL_DRAFT_TOAST, IS_STATIC, STATIC_REVIEWS, openEmailDraft } from "@/lib/static";
 
 function FadeInSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -38,7 +39,8 @@ function StarRating({ rating, onRate, interactive = false }: { rating: number; o
 }
 
 export default function Reviews() {
-  const { data: reviews, isLoading } = trpc.reviews.approved.useQuery();
+  const { data, isLoading } = trpc.reviews.approved.useQuery(undefined, { enabled: !IS_STATIC });
+  const reviews = IS_STATIC ? STATIC_REVIEWS : data;
   const submitReview = trpc.reviews.submit.useMutation();
   const utils = trpc.useUtils();
 
@@ -55,6 +57,19 @@ export default function Reviews() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (IS_STATIC) {
+      openEmailDraft(`Review from ${form.name}`, {
+        Name: form.name,
+        Email: form.email,
+        Location: form.location,
+        Rating: `${form.rating} / 5`,
+        Destination: form.destination,
+        Title: form.title,
+        Review: form.content,
+      });
+      toast.success(EMAIL_DRAFT_TOAST);
+      return;
+    }
     try {
       const result = await submitReview.mutateAsync(form);
       if (result.autoApproved) {

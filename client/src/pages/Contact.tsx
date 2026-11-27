@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
+import { EMAIL_DRAFT_TOAST, IS_STATIC, openEmailDraft } from "@/lib/static";
 
 function FadeInSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -67,6 +68,16 @@ export default function Contact() {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (IS_STATIC) {
+      openEmailDraft(contactForm.subject || "Travel inquiry", {
+        Name: `${contactForm.firstName} ${contactForm.lastName}`,
+        Email: contactForm.email,
+        Phone: contactForm.phone,
+        Message: contactForm.message,
+      });
+      toast.success(EMAIL_DRAFT_TOAST);
+      return;
+    }
     try {
       await submitContact.mutateAsync(contactForm);
       toast.success("Message sent! We'll be in touch soon.");
@@ -78,6 +89,26 @@ export default function Contact() {
 
   const handleQuestionnaireSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (IS_STATIC) {
+      openEmailDraft("Travel questionnaire", {
+        Name: `${qForm.firstName} ${qForm.lastName}`,
+        Email: qForm.email,
+        Phone: qForm.phone,
+        Destination: qForm.destination,
+        "Travel dates": qForm.travelDates,
+        Flexibility: qForm.flexibility,
+        Travelers: qForm.travelers,
+        Budget: qForm.budget,
+        Occasion: qForm.occasion,
+        "Accommodation style": qForm.accommodationStyle,
+        Interests: qForm.interests,
+        "Dietary needs": qForm.dietaryNeeds,
+        "Mobility needs": qForm.mobilityNeeds,
+        "Additional notes": qForm.additionalNotes,
+      });
+      toast.success(EMAIL_DRAFT_TOAST);
+      return;
+    }
     try {
       await submitQuestionnaire.mutateAsync(qForm);
       toast.success("Questionnaire submitted successfully!");

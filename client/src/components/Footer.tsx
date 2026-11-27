@@ -1,6 +1,7 @@
 import { Link } from "wouter";
+import { asset } from "@/lib/static";
 
-const LOGO_URL = "/images/katie-lee-logo.png";
+const LOGO_URL = asset("/images/katie-lee-logo.png");
 
 export default function Footer() {
   return (

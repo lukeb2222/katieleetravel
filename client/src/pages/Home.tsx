@@ -4,12 +4,13 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { asset, IS_STATIC, STATIC_REVIEWS } from "@/lib/static";
 import { ArrowRight, Globe, Star, Heart, MapPin, Calendar, Plane, Quote } from "lucide-react";
 
 const HERO_IMAGES = [
-  "/images/hero-1.jpg",
-  "/images/hero-2.jpg",
-  "/images/hero-3.jpg",
+  asset("/images/hero-1.jpg"),
+  asset("/images/hero-2.jpg"),
+  asset("/images/hero-3.jpg"),
 ];
 
 function FadeInSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -29,7 +30,8 @@ function FadeInSection({ children, className = "", delay = 0 }: { children: Reac
 }
 
 function TestimonialCarousel() {
-  const { data: reviews, isLoading } = trpc.reviews.approved.useQuery();
+  const { data, isLoading } = trpc.reviews.approved.useQuery(undefined, { enabled: !IS_STATIC });
+  const reviews = IS_STATIC ? STATIC_REVIEWS : data;
   const [currentIndex, setCurrentIndex] = useState(0);
   const testimonials = reviews || [];
 
@@ -206,7 +208,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <FadeInSection>
               <img
-                src="/images/services-image.jpg"
+                src={asset("/images/services-image.jpg")}
                 alt="Luxury travel destination"
                 className="w-full h-[500px] object-cover rounded-lg"
               />
@@ -289,7 +291,7 @@ export default function Home() {
             <FadeInSection delay={0.1}>
               <div className="text-center">
                 <img
-                  src="/images/katie-photo.jpg"
+                  src={asset("/images/katie-photo.jpg")}
                   alt="Katie Tseng Mohammed"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />
@@ -303,7 +305,7 @@ export default function Home() {
             <FadeInSection delay={0.2}>
               <div className="text-center">
                 <img
-                  src="/images/shelby-photo.jpg"
+                  src={asset("/images/shelby-photo.jpg")}
                   alt="Shelby Marie Karros"
                   className="w-48 h-48 rounded-full object-cover mx-auto mb-6 border-2 border-white/20"
                 />
@@ -349,8 +351,8 @@ export default function Home() {
         <div className="container">
           <FadeInSection>
             <div className="flex items-center justify-center gap-12 md:gap-20 opacity-70">
-              <img src="/images/virtuoso-logo.png" alt="Virtuoso" className="h-10 md:h-12 object-contain" />
-              <img src="/images/smartflyer-logo.png" alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
+              <img src={asset("/images/virtuoso-logo.png")} alt="Virtuoso" className="h-10 md:h-12 object-contain" />
+              <img src={asset("/images/smartflyer-logo.png")} alt="SmartFlyer" className="h-10 md:h-12 object-contain" />
             </div>
           </FadeInSection>
         </div>
